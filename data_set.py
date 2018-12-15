@@ -1,9 +1,9 @@
 import numpy as np
 
 class DataSet(object):
-    def __init__(self,num):
-        self.xs = np.floor(np.load("trainAttribute"+str(num)+".npy") + 0.5)
-        self.labels = np.floor(np.load("trainLable"+str(num)+".npy") + 0.5)
+    def __init__(self,num, prefix="train"):
+        self.xs = np.floor(np.load(prefix + "Attribute"+str(num)+".npy") + 0.5)
+        self.labels = np.floor(np.load(prefix + "Lable"+str(num)+".npy") + 0.5)
         self.num_examples = len(self.xs)
         self.point=0#表示完成处理的位置
         print(self.xs)
