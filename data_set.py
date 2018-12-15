@@ -10,22 +10,24 @@ class DataSet(object):
 
     def next_batch(self, batch_num):
         end=self.point+batch_num
-        if end<self.num_examples:
+        if end<=self.num_examples:
             xs = self.xs[self.point:end]
             labels = self.labels[self.point:end]
             self.point=end
         else:
-            xs = self.xs[self.point:]
-            labels = self.labels[self.point:]
-            self.point = self.num_examples-1
+            end=end-self.num_examples
+            xs = np.vstack([self.xs[self.point:],self.xs[0:end]])
+            labels = np.vstack([self.labels[self.point:],self.labels[0:end]])
+            self.point = end
         return xs, labels
 
 
 if __name__ == "__main__":
     print("abcc")
     a = DataSet(0)
-    b=a.next_batch(1)
+    b=a.next_batch(101760)
     print(b)
     print(b[0].shape)
-    c=a.next_batch(5)
+    c=a.next_batch(10)
     print(c[0].shape)
+
