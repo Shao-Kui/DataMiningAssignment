@@ -79,6 +79,11 @@ class DataSet(object):
         self.labels = np.floor(np.random.random(size=(num, 3)) + 0.5)
         print(self.xs)
 
+    def next_batch(self, batch_num):
+        xs = np.array([batch_num, 2826])
+        labels = np.array([batch_num, 3])
+        return xs, labels
+
 
 if __name__ == "__main__":
     net = NaiveNet()
