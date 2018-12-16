@@ -3,9 +3,9 @@ import numpy as np
 import os
 from data_set import DataSet
 
-layer_dims = [573, 41, 3]
+layer_dims = [573, 300, 300, 300, 100, 100, 100, 30, 30, 30, 10, 10, 10, 3]
 batch_num = 10000
-learning_rate = 0.0005
+learning_rate = 0.001
 
 
 def get_weights(input_dim, output_dim):
@@ -41,7 +41,11 @@ class NaiveNet(object):
         assert len(biases) == len(weights), "length of biases should be equal to weights"
         out_value = self.input_x
         for i in range(len(weights) - 1):
+            x = out_value
             out_value = tf.nn.leaky_relu(out_value @ weights[i] + biases[i])
+            if tf.shape(out_value)[1] == tf.shape(x)[1]:
+                out_value = out_value + x
+            # out_value = tf.nn.l2_normalize(out_value)
         self.predict_y = out_value @ weights[-1] + biases[-1]
         self.loss = tf.nn.softmax_cross_entropy_with_logits(labels=self.label_y, logits=self.predict_y)
         self.loss = tf.reduce_mean(self.loss)
@@ -92,7 +96,7 @@ class NaiveNet(object):
                     save_path = saver.save(self.sess, "./tmp/model.ckpt")
                     print("Model saved in path: %s" % save_path)
                     print("Current max accuracy is ", validate_result)
-            xs, diags, labels = data_set.next_batch(batch_num)
+            xs, labels = data_set.next_batch(batch_num)
             self.sess.run(optimizer, feed_dict={self.input_x: xs,
                                                 self.label_y: labels,
                                                 self.keep_prob: 0.4})
@@ -100,4 +104,4 @@ class NaiveNet(object):
 
 if __name__ == "__main__":
     net = NaiveNet()
-    net.train(80000, DataSet(6), DataSet(6, prefix="test"))
+    net.train(80000, DataSet(0), DataSet(0, prefix="test"))
