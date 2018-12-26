@@ -4,10 +4,10 @@ import os
 from sklearn.metrics import accuracy_score, recall_score, precision_score
 from data_set import DataSet
 
-layer_dims = [573, 41, 3]
+layer_dims = [2826, 46, 10, 3]
 batch_num = 10000
 learning_rate = 0.0005
-
+diag_dim = 2253
 accuracies = []
 precisions = []
 recalls = []
@@ -34,8 +34,11 @@ class NaiveNet(object):
         self.best_f1 = 0
         self.max_test_accuracy = 0.0
         self.input_x = tf.placeholder(tf.float32, shape=[None, self.input_dim], name="input_x")
+        self.diag_x = tf.placeholder(tf.float32, shape=[None, diag_dim], name="diag_x")
+        self.input_concat = tf.concat([self.input_x, self.diag_x], 1)
         self.label_y = tf.placeholder(tf.float32, shape=[None, self.label_dim], name="label_y")
         self.keep_prob = tf.placeholder(tf.float32)
+
         weights = list()
         weights_length = len(layer_dims) - 1
         i = 0
@@ -49,7 +52,7 @@ class NaiveNet(object):
             i = i + 1
         # Forward pass
         assert len(biases) == len(weights), "length of biases should be equal to weights"
-        out_value = self.input_x
+        out_value = self.input_concat
         for i in range(len(weights) - 1):
             out_value = tf.nn.leaky_relu(out_value @ weights[i] + biases[i])
         self.predict_y = out_value @ weights[-1] + biases[-1]
@@ -75,37 +78,16 @@ class NaiveNet(object):
                                                    data_set.num_examples,
                                                    self.decay_rate, staircase=True)
         optimizer = tf.train.AdamOptimizer(learning_rate_decay).minimize(self.loss, global_step=self.global_step)
-        # optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(self.loss, global_step=self.global_step)
-        # if os.path.isfile("./tmp/model.ckpt.meta"):
-        #     saver = tf.train.Saver()
-        #     saver.restore(self.sess, "./tmp/model.ckpt")
-        #     print("Model restored.")
-        # else:
-        #     self.sess.run(tf.global_variables_initializer())
         self.sess.run(tf.global_variables_initializer())
         for i in range(step_num):
             if i % 1 == 0:
-                # validate_result = self.sess.run(self.accuracy,
-                #                                 feed_dict={self.input_x: validation_set.xs,
-                #                                            self.diag_x: validation_set.diags,
-                #                                            self.label_y: validation_set.labels,
-                #                                            self.keep_prob: 0.4})
-                # train_result = self.sess.run(self.accuracy,
-                #                              feed_dict={self.input_x: data_set.xs,
-                #                                         self.diag_x: data_set.diags,
-                #                                         self.label_y: data_set.labels,
-                #                                         self.keep_prob: 0.4})
-                # print("After %d training step(s), validation accuracy is %g "
-                #       % (i, validate_result))
-                # print("After %d training step(s), training   accuracy is %g "
-                #       % (i, train_result))
                 predict_y = self.predict(validation_set)
                 test_y = np.argmax(validation_set.labels, axis=1)
                 precision = precision_score(test_y, predict_y, average='macro')
                 accu = accuracy_score(test_y, predict_y)
                 recall = recall_score(test_y, predict_y, average='macro')
                 F1 = (2.0 * recall * precision) / (recall + precision)
-                if F1 > self.best_f1:
+                if accu > 0.5:
                     self.best_f1 = F1
                     self.best_accu = accu
                     self.best_precision = precision
@@ -116,20 +98,16 @@ class NaiveNet(object):
                     print("Recall: ", recall)
                     print("F1: ", F1)
                     print("---------------------------------------------")
-                # if self.max_test_accuracy < validate_result:
-                #     saver = tf.train.Saver()
-                #     self.max_test_accuracy = validate_result
-                #     save_path = saver.save(self.sess, "./tmp/model.ckpt")
-                #     print("Model saved in path: %s" % save_path)
-                #     print("Current max accuracy is ", validate_result)
             xs, diags, labels = data_set.next_batch(batch_num)
             self.sess.run(optimizer, feed_dict={self.input_x: xs,
                                                 self.label_y: labels,
+                                                self.diag_x: diags,
                                                 self.keep_prob: 0.4})
 
     def predict(self, dataset):
         return self.sess.run(self.predict_y_label,
                                         feed_dict={self.input_x: dataset.xs,
+                                                   self.diag_x: dataset.diags,
                                                    self.label_y: dataset.labels,
                                                    self.keep_prob: 0.4})
 
