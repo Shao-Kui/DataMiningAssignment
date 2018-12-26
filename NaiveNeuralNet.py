@@ -1,6 +1,5 @@
 import tensorflow as tf
 import numpy as np
-import os
 from sklearn.metrics import accuracy_score, recall_score, precision_score
 from data_set import DataSet
 

@@ -1,11 +1,17 @@
 import csv
 import numpy as np
 
-#attribute=[]
-attribute=['encounter_id', 'patient_nbr', 'race', 'gender', 'age', 'weight', 'admission_type_id', 'discharge_disposition_id', 'admission_source_id', 'time_in_hospital', 'payer_code', 'medical_specialty', 'num_lab_procedures', 'num_procedures', 'num_medications', 'number_outpatient', 'number_emergency', 'number_inpatient', 'diag_1', 'diag_2', 'diag_3', 'number_diagnoses', 'max_glu_serum', 'A1Cresult', 'metformin', 'repaglinide', 'nateglinide', 'chlorpropamide', 'glimepiride', 'acetohexamide', 'glipizide', 'glyburide', 'tolbutamide', 'pioglitazone', 'rosiglitazone', 'acarbose', 'miglitol', 'troglitazone', 'tolazamide', 'examide', 'citoglipton', 'insulin', 'glyburide-metformin', 'glipizide-metformin', 'glimepiride-pioglitazone', 'metformin-rosiglitazone', 'metformin-pioglitazone', 'change', 'diabetesMed', 'readmitted']
+# attribute=['encounter_id', 'patient_nbr', 'race', 'gender', 'age', 'weight', 'admission_type_id', 'discharge_disposition_id',
+#            'admission_source_id', 'time_in_hospital', 'payer_code', 'medical_specialty', 'num_lab_procedures', 'num_procedures',
+#            'num_medications', 'number_outpatient', 'number_emergency', 'number_inpatient', 'number_diagnoses', 'max_glu_serum',
+# 'A1Cresult', 'metformin', 'repaglinide', 'nateglinide', 'chlorpropamide', 'glimepiride', 'acetohexamide', 'glipizide', 'glyburide',
+# 'tolbutamide', 'pioglitazone', 'rosiglitazone', 'acarbose', 'miglitol', 'troglitazone', 'tolazamide', 'examide', 'citoglipton', 'insulin',
+# 'glyburide-metformin', 'glipizide-metformin', 'glimepiride-pioglitazone', 'metformin-rosiglitazone', 'metformin-pioglitazone', 'change',
+# 'diabetesMed', 'readmitted']
+attribute=['diag_1', 'diag_2', 'diag_3', 'readmitted']
 dic={}
 artTonum={}
-csvfile=open(r'diabetic_data.csv')
+csvfile=open(r'diabetic_data_diag.csv')
 readCSV = csv.DictReader(csvfile, delimiter=',')
 
 #for row in readCSV:
@@ -72,7 +78,7 @@ result=resultTmp.reshape(int(len(resultList)/totalAttribute),totalAttribute)
 print(result[1])
 print(result.shape)
 #np.savetxt("result.txt",result)
-np.save("attribute",result)
+np.save("attribute_diag",result)
 #print(result)
 
 
@@ -104,7 +110,7 @@ lableResult=lableTmp.reshape(int(len(lableList)/3),3)
 print(lableResult[18])
 print(lableResult.shape)
 #np.savetxt("result.txt",result)
-np.save("lable",lableResult)
+# np.save("lable",lableResult)
 
 print("abcc")
 
